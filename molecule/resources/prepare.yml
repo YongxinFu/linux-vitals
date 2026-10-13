@@ -145,3 +145,39 @@
       ansible.builtin.file:
         path: "{{ flaky_marker }}"
         state: absent
+
+    - name: Start the system bus for unprivileged service discovery
+      ansible.builtin.systemd_service:
+        name: "{{ vitals_test_system_bus_service }}"
+        state: started
+        daemon_reload: true
+      when: vitals_test_system_bus_service is defined
+
+    - name: Create a journal reader without system journal group membership
+      ansible.builtin.user:
+        name: vitals-journal-reader
+        groups: ""
+        append: false
+        create_home: true
+
+    - name: Flush the system journal before the unprivileged scan
+      ansible.builtin.command:
+        argv:
+          - journalctl
+          - --sync
+      changed_when: false
+
+    - name: Confirm the system journal is readable before testing denied access
+      ansible.builtin.command:
+        argv:
+          - journalctl
+          - --system
+          - --no-pager
+          - --lines=1
+      environment:
+        LC_ALL: C
+      register: journal_sample
+      changed_when: false
+      failed_when: >-
+        journal_sample.rc != 0 or journal_sample.stdout | trim == ''
+        or '-- No entries --' in journal_sample.stdout
