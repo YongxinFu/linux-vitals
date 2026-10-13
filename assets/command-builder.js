@@ -38,7 +38,6 @@
     playbook: "healthcheck",
     inventory: "inventory.ini",
     become: false,
-    check: false,
     forks: "",
     maintenanceId: "",
     tags: [],
@@ -138,7 +137,6 @@
     var cmd = "ansible-playbook -i " + (state.inventory || "inventory.ini") + " " + FQCN + "." + state.playbook;
 
     if (state.become) cmd += " \\\n  --become";
-    if (state.check) cmd += " \\\n  --check";
     if (state.forks) cmd += " \\\n  --forks " + state.forks;
     if (state.tags.length) cmd += " \\\n  --tags " + state.tags.join(",");
     if (state.maintenanceId) {
@@ -292,7 +290,7 @@
     } else if (spec.choices) {
       input = el("select", { id: "i-" + spec.name });
       spec.choices.forEach(function (choice) {
-        var opt = el("option", { value: choice, text: choice });
+        var opt = el("option", { value: choice, text: choice === "" ? "(empty — off)" : choice });
         if (choice === spec.default) opt.selected = true;
         input.appendChild(opt);
       });
@@ -362,6 +360,76 @@
     });
   }
 
+
+  /* ---------- share links ----------
+     The configuration round-trips through the URL hash so a link reopens the
+     exact command. Credential variables are left out for the same reason they
+     stay off the command line: a URL ends up in browser history, chat logs and
+     referrer headers.                                                         */
+
+  function encodeShare() {
+    var vars = {};
+    changedSpecs().forEach(function (spec) {
+      if (!spec.secret) vars[spec.name] = state.vars[spec.name];
+    });
+    var payload = {
+      p: state.playbook, i: state.inventory, m: state.maintenanceId,
+      f: state.forks, b: state.become, t: state.tags, v: vars
+    };
+    var json = JSON.stringify(payload);
+    var b64 = btoa(unescape(encodeURIComponent(json)))
+      .replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
+    return location.href.split("#")[0] + "#builder?c=" + b64;
+  }
+
+  function setInput(id, value) {
+    var node = document.getElementById(id);
+    if (!node) return;
+    if (node.type === "checkbox") node.checked = Boolean(value);
+    else node.value = value;
+  }
+
+  function applyShare() {
+    var m = /^#builder\?c=([A-Za-z0-9_-]+)$/.exec(location.hash);
+    if (!m) return false;
+    var payload;
+    try {
+      var b64 = m[1].replace(/-/g, "+").replace(/_/g, "/");
+      payload = JSON.parse(decodeURIComponent(escape(atob(b64))));
+    } catch (e) {
+      return false;   // a mangled link opens the default builder, not a broken one
+    }
+    var byName = {};
+    allSpecs().forEach(function (spec) { byName[spec.name] = spec; });
+
+    if (["healthcheck", "baseline", "postcheck"].indexOf(payload.p) !== -1) state.playbook = payload.p;
+    if (typeof payload.i === "string") state.inventory = payload.i;
+    if (typeof payload.m === "string") state.maintenanceId = payload.m;
+    if (payload.f) state.forks = String(parseInt(payload.f, 10) || "");
+    state.become = Boolean(payload.b);
+    var known = TAGS.map(function (pair) { return pair[0]; });
+    state.tags = (payload.t || []).filter(function (t) { return known.indexOf(t) !== -1; });
+
+    Object.keys(payload.v || {}).forEach(function (name) {
+      var spec = byName[name];
+      if (!spec || spec.secret) return;   // never accept a credential from a URL either
+      var value = payload.v[name];
+      state.vars[name] = spec.type === "bool" ? Boolean(value) : String(value);
+      setInput("i-" + name, state.vars[name]);
+    });
+
+    setInput("cb-playbook", state.playbook);
+    setInput("cb-inventory", state.inventory);
+    setInput("cb-maintenance", state.maintenanceId);
+    setInput("cb-forks", state.forks);
+    setInput("cb-become", state.become);
+    document.getElementById("cb-maintenance-row").style.display = state.playbook === "healthcheck" ? "none" : "";
+    Array.prototype.forEach.call(document.querySelectorAll("#cb-tags .cb-btn"), function (btn) {
+      btn.setAttribute("aria-pressed", String(state.tags.indexOf(btn.textContent) !== -1));
+    });
+    return true;
+  }
+
   /* ---------- wiring ---------- */
 
   function bind(id, event, fn) {
@@ -400,7 +468,6 @@
     bind("cb-maintenance", "input", function (e) { state.maintenanceId = e.target.value; render(); });
     bind("cb-forks", "input", function (e) { state.forks = e.target.value; render(); });
     bind("cb-become", "change", function (e) { state.become = e.target.checked; render(); });
-    bind("cb-checkmode", "change", function (e) { state.check = e.target.checked; render(); });
     bind("cb-search", "input", function (e) { state.search = e.target.value; applyFilter(); });
     bind("cb-only-changed", "click", function (e) {
       state.onlyChanged = !state.onlyChanged;
@@ -440,7 +507,31 @@
       });
     });
 
+    bind("cb-share", "click", function (e) {
+      var btn = e.currentTarget;
+      var url = encodeShare();
+      try { history.replaceState(null, "", url); } catch (err) {}
+      navigator.clipboard.writeText(url).then(function () {
+        btn.textContent = "Link copied";
+        setTimeout(function () { btn.textContent = "Share"; }, 1600);
+      }).catch(function () {
+        btn.textContent = "Link in address bar";
+        setTimeout(function () { btn.textContent = "Share"; }, 2200);
+      });
+    });
+
+    var shared = applyShare();
     render();
+    if (shared) {
+      // Opened from a share link: show what the link meant, open the groups it
+      // touched, and bring the builder into view.
+      state.onlyChanged = true;
+      var only = document.getElementById("cb-only-changed");
+      if (only) only.setAttribute("aria-pressed", "true");
+      applyFilter();
+      var section = document.getElementById("builder");
+      if (section) setTimeout(function () { section.scrollIntoView(); }, 50);
+    }
   }
 
   if (document.readyState === "loading") {
