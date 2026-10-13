@@ -47,6 +47,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - `docs/architecture.md` and `CONTRIBUTING.md` state the rule for new checks:
   tell "ran and found nothing" from "could not run", and raise an `unknown`
   finding for the second.
+- `docs/roadmap.md` moves the notification send-path tests
+  ([#29](https://github.com/sameeralam3127/linux-vitals/issues/29)) from
+  2.2.0 to 2.3.0
+  ([#126](https://github.com/sameeralam3127/linux-vitals/issues/126)).
 
 ## [2.1.0] - 2026-10-10
 

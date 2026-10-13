@@ -37,8 +37,8 @@ waits for February.
 | Month | Theme | Release | Issues |
 | --- | --- | --- | --- |
 | [October 2026](#october-2026-ship-what-is-done-then-the-finding-contract) | Ship what is done; the finding contract | **2.1.0** (released 10 October) | 3 |
-| [November 2026](#november-2026-finish-trust-scale-and-safety) | Finish Trust: scale and safety | **2.2.0 -- Trust** (end of November) | 2 |
-| [December 2026](#december-2026-artefacts-and-the-task-tree) | Artefacts and the task tree | -- | 5 |
+| [November 2026](#november-2026-finish-trust-scale-and-safety) | Finish Trust: scale and safety | **2.2.0 -- Trust** (end of November) | 1 |
+| [December 2026](#december-2026-artefacts-and-the-task-tree) | Artefacts and the task tree | -- | 6 |
 | [January 2027](#january-2027-coverage-and-adoption) | Coverage and adoption | **2.3.0 -- Coverage** (end of January) | 3 |
 | [Any month](#any-month-community-issues) | `good first issue`s, for whoever picks them up | next release | 0 |
 | [Not before February 2027](#not-before-february-2027) | Integrations, exports, compliance, further breadth | -- | 5 |
@@ -143,14 +143,12 @@ Ordering notes:
 
 ## November 2026: Finish Trust, scale and safety
 
-The rest of Trust: the run must be safe to point at a real fleet, and the
-parts of it that handle credentials must be tested. **2.2.0 -- Trust** ships at
-the end of the month.
+The rest of Trust: the run must be safe to point at a real fleet.
+**2.2.0 -- Trust** ships at the end of the month.
 
 | Item | Issue | Priority |
 | --- | --- | --- |
 | Journal scans are unbounded and ship whole-window logs to the control node | [#23](https://github.com/sameeralam3127/linux-vitals/issues/23) | high |
-| `notify.yml` send path, skip conditions, and `.env` precedence are untested | [#29](https://github.com/sameeralam3127/linux-vitals/issues/29) | medium |
 
 Ordering notes:
 
@@ -163,9 +161,6 @@ Ordering notes:
   in a crash loop should not cost different amounts to scan. It ships in the
   same release as [#62](https://github.com/sameeralam3127/linux-vitals/issues/62),
   so `schema_version` moves once.
-- [#29](https://github.com/sameeralam3127/linux-vitals/issues/29) is the only
-  path in the collection that handles secrets, and it is untested. The
-  redaction tests prove what it does not print; this proves what it sends.
 
 ## December 2026: Artefacts and the task tree
 
@@ -181,6 +176,7 @@ review.
 | Static analysis raises ~40 findings; most are intentional and nothing records why | [#72](https://github.com/sameeralam3127/linux-vitals/issues/72) | medium |
 | Decide whether CI toolchain uses hashed lockfiles | [#74](https://github.com/sameeralam3127/linux-vitals/issues/74) | low |
 | Report all failed systemd units; make the required-service list configurable | [#32](https://github.com/sameeralam3127/linux-vitals/issues/32) | medium |
+| `notify.yml` send path, skip conditions, and `.env` precedence are untested | [#29](https://github.com/sameeralam3127/linux-vitals/issues/29) | medium |
 
 Ordering notes:
 
@@ -212,6 +208,13 @@ Ordering notes:
   replaced the two copies of the required-service map with one shared
   `roles/vitals_scan/tasks/services.yml`. The configurable list is one change
   to that task instead of two.
+- [#29](https://github.com/sameeralam3127/linux-vitals/issues/29) moved here
+  from November on 2026-10-13, out of 2.2.0 and into 2.3.0. It is no longer a
+  Trust item, so the rule that Trust items never drop does not hold it. It is
+  still the only path in the collection that handles secrets. The redaction
+  tests from [#37](https://github.com/sameeralam3127/linux-vitals/pull/37)
+  prove what it does not print; this proves what it sends -- the send path,
+  the skip conditions, and `.env` precedence.
 
 ## January 2027: Coverage and adoption
 
