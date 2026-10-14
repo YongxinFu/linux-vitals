@@ -44,7 +44,7 @@
   "kernel_install_failure_excerpt": [],
   "kernel_install_failures": 0,
   "last_failed_login": "No failed login attempts found",
-  "last_reboot": "system boot  2026-09-12 08:30",
+  "last_reboot": "2026-09-12 08:30",
   "latest_installed_kernel": "6.10.12-200.fc40.x86_64",
   "latest_kernel_selected": false,
   "latest_kernel_updated_at": "2026-09-25 20:12:41.000000000 +0000",

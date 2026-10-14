@@ -925,8 +925,9 @@
       {{
         linux_vitals_last_reboot_cmd.stdout
         | default('Unknown')
-        | regex_replace('^\\s*system boot\\s+', '')
+        | regex_replace('^\s*system boot\s+', '')
         | trim
+        | default('Unknown', true)
       }}
     linux_vitals_rescue_image_available: >-
       {{

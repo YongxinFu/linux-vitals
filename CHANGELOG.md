@@ -89,6 +89,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
   every supported distribution ships it, and a host without it reports the
   finding as `unknown` rather than clean. A `linux_vitals_log_max_lines`
   below `1` also makes both journal findings `unknown`.
+- `last_reboot` reports `Unknown` when `who -b` returns empty,
+  whitespace-only, or missing output, and strips the `system boot` prefix
+  from normal timestamps
+  ([#122](https://github.com/sameeralam3127/linux-vitals/issues/122)).
 
 ### Added
 

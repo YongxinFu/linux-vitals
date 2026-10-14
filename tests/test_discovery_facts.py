@@ -7,10 +7,11 @@ with just the input facts that expression depends on. This keeps the tests
 tied to the production template text without requiring the rest of
 discovery.yml's many prerequisite command results.
 
-See CHANGELOG.md for the two bugs these facts fix:
+See CHANGELOG.md for the bugs these facts fix:
 - `selinux_status` was reported as an empty string on Debian hosts (no
   `getenforce`) instead of "not-installed".
 - The scan crashed on any host without a separate `/boot` mount.
+- `last_reboot` was empty when `who -b` returned no boot record.
 """
 from __future__ import annotations
 
@@ -126,6 +127,46 @@ def test_selinux_status_treats_whitespace_only_stdout_as_not_installed(tmp_path:
     status = _run_selinux_status(tmp_path, {"stdout": "   \n", "rc": 0})
 
     assert status == "not-installed"
+
+
+# ---------------------------------------------------------------------------
+# linux_vitals_last_reboot
+# ---------------------------------------------------------------------------
+
+def _run_last_reboot(tmp_path: Path, last_reboot_cmd: dict) -> str:
+    expr = _extract_set_fact_value("Finalize extended discovery facts", "linux_vitals_last_reboot")
+    tasks = [
+        {
+            "name": "Seed the who -b command result for the scenario under test",
+            "ansible.builtin.set_fact": {"linux_vitals_last_reboot_cmd": last_reboot_cmd},
+        },
+        {
+            "name": "Evaluate linux_vitals_last_reboot",
+            "ansible.builtin.set_fact": {"linux_vitals_last_reboot": expr},
+        },
+        _dump_task("linux_vitals_last_reboot"),
+    ]
+    return _run_playbook(tmp_path, tasks)["value"]
+
+
+def test_last_reboot_defaults_to_unknown_on_empty_stdout(tmp_path: Path) -> None:
+    assert _run_last_reboot(tmp_path, {"stdout": "", "rc": 0}) == "Unknown"
+
+
+def test_last_reboot_defaults_to_unknown_on_whitespace_only_stdout(tmp_path: Path) -> None:
+    assert _run_last_reboot(tmp_path, {"stdout": "   \n", "rc": 0}) == "Unknown"
+
+
+def test_last_reboot_defaults_to_unknown_when_stdout_missing(tmp_path: Path) -> None:
+    assert _run_last_reboot(tmp_path, {"rc": 1}) == "Unknown"
+
+
+def test_last_reboot_reports_timestamp(tmp_path: Path) -> None:
+    result = _run_last_reboot(
+        tmp_path, {"stdout": "         system boot  2026-09-24 10:55\n", "rc": 0}
+    )
+
+    assert result == "2026-09-24 10:55"
 
 
 # ---------------------------------------------------------------------------

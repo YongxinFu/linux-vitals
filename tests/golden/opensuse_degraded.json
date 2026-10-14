@@ -44,7 +44,7 @@
   "kernel_install_failure_excerpt": [],
   "kernel_install_failures": 0,
   "last_failed_login": "deploy   ssh:notty    10.0.1.5         Sat Sep 26 09:14 - 09:14  (00:00)",
-  "last_reboot": "system boot  2026-08-13 10:02",
+  "last_reboot": "2026-08-13 10:02",
   "latest_installed_kernel": "6.4.0-150600.23.25-default",
   "latest_kernel_selected": false,
   "latest_kernel_updated_at": "2026-09-24 07:18:02.000000000 +0000",

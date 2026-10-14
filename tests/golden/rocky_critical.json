@@ -71,7 +71,7 @@
   ],
   "kernel_install_failures": 2,
   "last_failed_login": "No failed login attempts found",
-  "last_reboot": "system boot  2026-09-19 14:02",
+  "last_reboot": "2026-09-19 14:02",
   "latest_installed_kernel": "5.14.0-427.13.1.el9_4.x86_64",
   "latest_kernel_selected": true,
   "latest_kernel_updated_at": "2026-09-19 13:40:31.000000000 +0000",

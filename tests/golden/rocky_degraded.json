@@ -44,7 +44,7 @@
   "kernel_install_failure_excerpt": [],
   "kernel_install_failures": 0,
   "last_failed_login": "admin    ssh:notty    198.51.100.23    Sat Sep 26 12:58 - 12:58  (00:00)",
-  "last_reboot": "system boot  2026-08-21 09:20",
+  "last_reboot": "2026-08-21 09:20",
   "latest_installed_kernel": "5.14.0-503.14.1.el9_5.x86_64",
   "latest_kernel_selected": false,
   "latest_kernel_updated_at": "2026-09-25 23:01:17.000000000 +0000",
