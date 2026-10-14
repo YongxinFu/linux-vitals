@@ -24,6 +24,49 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ### Fixed
 
+- **Self-healing no longer reports a service `Fixed` before the restart has
+  held** ([#24](https://github.com/sameeralam3127/linux-vitals/issues/24)).
+  `vitals_heal` read each unit's state once, straight after restarting it. A
+  `Type=simple` unit counts as started as soon as it forks, so one that died a
+  second later was still running at that look and was reported `Fixed`, and
+  counted in `auto_fixed_count`. Each restarted unit is now polled with
+  `systemctl show` until it is active, failed or inactive, and a unit that came
+  up must still be active, on the same run, after a stability window. One that
+  dies or is restarted by systemd in that window is `Failed to Fix`.
+
+  When the check itself cannot complete -- the unit is still starting when the
+  budget runs out, or its state cannot be read -- the attempt is
+  `Manual Intervention Required` and its `service_manual_followup` finding is
+  `unknown`, with the reason, instead of defaulting to the optimistic reading.
+  Each `healing_results` entry gains `outcome` (`fixed`, `still_failed`,
+  `unknown`), a `reason` code that tells "still activating", "failed" and
+  "the restart command errored" apart, and a `detail` sentence, which the
+  dashboard shows. `result` keeps its three values and their meaning for
+  units that settle at once, so nothing that reads `result` changes; adding a
+  fourth value would have been a breaking change. Additive within schema
+  `2.1`.
+
+  New variables, with defaults that cost nothing on a host where nothing was
+  restarted: `linux_vitals_heal_settle_retries` (`10`) and
+  `linux_vitals_heal_settle_delay` (`3`) bound the polling at 30 s per
+  unsettled unit, and `linux_vitals_heal_stability_seconds` (`5`) is waited
+  out once per host. Molecule gains a unit that dies 3 s after starting and a
+  `Type=notify` unit that takes 5 s to become ready.
+
+  Restart errors are now visible: `failed_when: false` on the restart had
+  hidden every one. A unit whose start job failed (a `Type=notify` or forking
+  service that cannot start, such as sssd with a broken config) is still
+  `Failed to Fix`, now with a `detail` saying the restart reported an error.
+  Only a restart that errored without leaving a failed unit -- the unit not
+  found, its state unreadable -- is `Manual Intervention Required` with
+  reason `restart_error`.
+
+  One outcome changes because the state now comes from systemd's
+  `ActiveState` rather than `service_facts`, which reports only
+  `SubState=running` as running: a oneshot `RemainAfterExit=yes` unit that
+  restarts cleanly (`active (exited)`) is now `Fixed`, where it used to be
+  `Manual Intervention Required`.
+
 - Unreadable, failed or unavailable system journals now raise `log_errors` and
   `kernel_install_failures` as `unknown`, with a reason, instead of reporting
   a clean log ([#118](https://github.com/sameeralam3127/linux-vitals/issues/118)).
