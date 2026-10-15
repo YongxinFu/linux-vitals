@@ -93,15 +93,6 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
   whitespace-only, or missing output, and strips the `system boot` prefix
   from normal timestamps
   ([#122](https://github.com/sameeralam3127/linux-vitals/issues/122)).
-- **A delivered email no longer fails the run**
-  ([#29](https://github.com/sameeralam3127/linux-vitals/issues/29)). Since
-  1.2.1, `notify.yml` treated the mail module's `changed` flag as proof of
-  delivery, but `community.general.mail` never sets it. Every email that
-  arrived was reported as `Email notification failed while talking to
-  <host>:<port>`, the run exited non-zero, and with email enabled the generic
-  webhook, which is sent after it, never went out. The check now looks for
-  the module's success message instead. Any other result, including a server
-  that refused some recipients, is still reported as a failure.
 
 ### Added
 
@@ -117,7 +108,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
   healthy only if it passes **and** every check on it ran, so a raised
   `linux_vitals_fail_on_severity` cannot hide one. The dashboard marks each
   unknown finding with its reason, adds an `N unknown` pill beside the
-  host's status, and adds a *Hosts with unknown checks* tile.
+  host's status, and adds a _Hosts with unknown checks_ tile.
 
   `final_status` is still `Pass` or `Fail`: a third value would be misread by
   any consumer checking `status == "Fail"`. The report's `schema_version`
@@ -128,19 +119,6 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
   new scan probe sets `failed_when: false`, so a new check is reviewed
   against the contract before it can reintroduce a false-clean report. See
   [docs/report-guide.md](docs/report-guide.md#status-when-a-check-could-not-run).
-
-- **Tests for notification delivery, skip conditions and `.env` precedence**
-  ([#29](https://github.com/sameeralam3127/linux-vitals/issues/29)).
-  `tests/test_notification_delivery.py` runs the real `config.yml` and
-  `notify.yml` against an HTTP listener and an SMTP sink on 127.0.0.1. It
-  asserts that an inventory or extra-vars value wins over `.env`, that `.env`
-  is used when inventory is unset (the 1.0.2 regression), that a channel set
-  in neither is skipped, and that each skip condition skips its send with
-  nothing arriving. It also checks that each Slack post, webhook post and
-  email carries what the role's templates render. The run uses a copy of the
-  collection seeded with decoy `.env` files, so a developer's real `.env` is
-  never read. No behaviour change apart from the email fix above; see
-  [docs/testing.md](docs/testing.md#notification-delivery-tests).
 
 ### Documentation
 
@@ -161,7 +139,7 @@ No breaking changes: every entry is additive or a fix, and each new variable
 defaults to the 2.0.0 behaviour. `schema_version` stays `2.0`. One fix changes
 a type on ansible-core 2.16 only: the comparison's RAM fields were strings
 there and are now numbers, as they already were on every newer core (see
-*Fixed*).
+_Fixed_).
 
 ### Added
 
@@ -218,7 +196,7 @@ there and are now numbers, as they already were on every newer core (see
   ([#38](https://github.com/sameeralam3127/linux-vitals/issues/38)). Under
   `--check`, Ansible skips the discovery probes, so the scan used to fail
   a few tasks later on an undefined fact (`object of type 'dict' has no
-  attribute 'services'`). It now stops before discovery with one message
+attribute 'services'`). It now stops before discovery with one message
   explaining why and saying to run without `--check`. Check mode never
   worked, so no working run is affected. Thanks
   [@Tiyatrotist](https://github.com/Tiyatrotist).
@@ -229,7 +207,7 @@ there and are now numbers, as they already were on every newer core (see
 
 - Document the `community.general` version constraint needed when installing
   on ansible-core 2.16, and what the `Collection community.general does not
-  support Ansible version 2.16.x` warning means
+support Ansible version 2.16.x` warning means
   ([#86](https://github.com/sameeralam3127/linux-vitals/issues/86)). Thanks
   [@rupayon123](https://github.com/rupayon123).
 
@@ -284,7 +262,7 @@ there and are now numbers, as they already were on every newer core (see
 
 **Breaking for anything that reads the JSON report, the generic webhook
 payload, or the `linux_vitals_result` host fact.** Findings changed from
-strings to `{id, message, severity}` objects (see *Changed*), which is why
+strings to `{id, message, severity}` objects (see _Changed_), which is why
 this is a major release rather than 1.4.0. Before upgrading:
 
 - Update any consumer of `findings`, `comparison.new_findings`, or
@@ -297,7 +275,7 @@ this is a major release rather than 1.4.0. Before upgrading:
 - The pass/fail outcome of a run is unchanged: `linux_vitals_fail_on_severity`
   defaults to `info`, the behaviour of every earlier release.
 - The Slack message is restructured and its default header changed (see
-  *Added*). Set `linux_vitals_slack_message_header` to keep the old one.
+  _Added_). Set `linux_vitals_slack_message_header` to keep the old one.
 
 A `requirements.yml` pin of `<2.0.0` keeps you on 1.3.1 until the consumers
 are updated.
@@ -329,7 +307,7 @@ are updated.
   The top-level `text` field carries a single short line
   (`LinuxVitals: FAIL — 3 host(s) checked, 1 critical, 0 auto-fixed`), which
   doubles as the mobile push preview. It is **not** the full plain-text
-  summary: Slack renders that field *above* the attachment, so sending the
+  summary: Slack renders that field _above_ the attachment, so sending the
   whole summary there printed the old-style message above the new card.
   `slack_message.txt.j2` is unchanged and still carried by the email body and
   the generic webhook's `message` field.
@@ -350,7 +328,6 @@ are updated.
 
   Written against finding ids rather than message text, so rewording a finding
   does not silently invalidate the runbook.
-
 
 - **`vitals_certs`: TLS certificate expiry and hardening checks**
   ([#15](https://github.com/sameeralam3127/linux-vitals/issues/15)). A fourth,
@@ -383,7 +360,6 @@ are updated.
   `linux_vitals_cert_warning_days`. See
   [docs/threat-model.md](docs/threat-model.md) for what enabling endpoint
   checks means for outbound connections and for `become`.
-
 
 - **Severity-based finding classification and alert thresholds**
   ([#8](https://github.com/sameeralam3127/linux-vitals/issues/8)). Every
@@ -463,8 +439,8 @@ are updated.
   been true for some time: every path that should live in the operator's
   project resolves from `inventory_dir`, and
   [docs/architecture.md](docs/architecture.md) has a section explaining that
-  `playbook_dir` was abandoned precisely because it resolves *inside the
-  installed collection* when invoked by FQCN. Anyone following the example
+  `playbook_dir` was abandoned precisely because it resolves _inside the
+  installed collection_ when invoked by FQCN. Anyone following the example
   would have put `.env` beside their playbook and silently got no
   notifications at all.
 
@@ -537,7 +513,7 @@ are updated.
 - **Role argument specs.** Each role now ships a `meta/argument_specs.yml`
   documenting every variable its `defaults/main.yml` defines, with a type, a
   default, and a description. `ansible-doc -t role
-  sameeralam3127.linux_vitals.vitals_scan` (and the other two) now renders
+sameeralam3127.linux_vitals.vitals_scan` (and the other two) now renders
   usable documentation, which matters most for operators who installed the
   collection from Galaxy and have no repository to read
   ([#40](https://github.com/sameeralam3127/linux-vitals/issues/40)).
@@ -574,7 +550,7 @@ are updated.
 - `test_galaxy_version_matches_changelog_latest_entry` compared `galaxy.yml`
   against the newest changelog heading of any kind, so the `[Unreleased]`
   section that `CONTRIBUTING.md` tells contributors to add always failed it.
-  It now skips `[Unreleased]` and compares against the newest *released*
+  It now skips `[Unreleased]` and compares against the newest _released_
   heading, which is what the test's stated intent -- catching a version bump
   with no changelog entry, or the reverse -- actually requires.
 
@@ -592,7 +568,7 @@ are updated.
 - **A failed notification printed the credential it was sent with.** Neither
   webhook task in `vitals_report`'s `notify.yml` set `no_log`, and
   `ansible.builtin.uri` does not treat `url` or `headers` as secret. A Slack
-  incoming-webhook URL *is* the bearer token for that channel, so any non-2xx
+  incoming-webhook URL _is_ the bearer token for that channel, so any non-2xx
   response, DNS failure, timeout, or `-v` run published it -- along with any
   `Authorization` header configured through
   `linux_vitals_generic_webhook_headers` -- into CI logs, terminal scrollback,
@@ -655,7 +631,7 @@ checks, linting, or template tests could have caught.
 ### Fixed
 
 - **Self-healing never restarted anything.** `vitals_heal` selected services
-  with `state == 'failed'` *and* a `status` containing `enabled`, but
+  with `state == 'failed'` _and_ a `status` containing `enabled`, but
   `service_facts` describes a failed systemd unit as `state: stopped` with
   `status: failed` -- the unit-file state is replaced by `failed`, so no unit
   could ever match both conditions. Failed units are now identified by either
@@ -687,7 +663,7 @@ default detection ([#2](https://github.com/sameeralam3127/linux-vitals/issues/2)
 
 ### Added
 
-- **Reboot detection now reports *how* it decided.** Every host carries
+- **Reboot detection now reports _how_ it decided.** Every host carries
   `reboot_required_source`, `reboot_detection_supported`,
   `reboot_required_packages`, and a human-readable `reboot_reason` alongside
   `reboot_required`. These surface in the JSON report (`reboot.source`,
@@ -750,7 +726,7 @@ default detection ([#2](https://github.com/sameeralam3127/linux-vitals/issues/2)
 
 ### Fixed
 
-- **`.env`-based notification config never actually worked.** `linux_vitals_dotenv_slack_webhook_url` (and the four other `linux_vitals_dotenv_*` secrets: generic webhook URL, SMTP host/username/password) referenced `linux_vitals_dotenv_contents` from *within the same `set_fact` call* that defined it -- the same same-task self-reference bug as the 1.0.1 bootloader fix, except here it failed silently (Ansible's `regex_findall` on an Undefined value fell through the `| default('', true)` chain to an empty string) instead of erroring, so it went undetected through every prior test and release. Every channel that relied on `.env` as a fallback (rather than an explicit inventory/`group_vars` value) was silently skipped. Split `vitals_report/tasks/config.yml`'s first task into two sequential tasks. Verified by re-running against the live Multipass fleet: the Slack notification task changed from `skipping` to `ok` and the webhook received an actual HTTP POST.
+- **`.env`-based notification config never actually worked.** `linux_vitals_dotenv_slack_webhook_url` (and the four other `linux_vitals_dotenv_*` secrets: generic webhook URL, SMTP host/username/password) referenced `linux_vitals_dotenv_contents` from _within the same `set_fact` call_ that defined it -- the same same-task self-reference bug as the 1.0.1 bootloader fix, except here it failed silently (Ansible's `regex_findall` on an Undefined value fell through the `| default('', true)` chain to an empty string) instead of erroring, so it went undetected through every prior test and release. Every channel that relied on `.env` as a fallback (rather than an explicit inventory/`group_vars` value) was silently skipped. Split `vitals_report/tasks/config.yml`'s first task into two sequential tasks. Verified by re-running against the live Multipass fleet: the Slack notification task changed from `skipping` to `ok` and the webhook received an actual HTTP POST.
 
 ## [1.0.1] - 2026-07-12
 
@@ -761,7 +737,7 @@ Fixes found by running `playbooks/baseline.yml` / `playbooks/postcheck.yml` agai
 - **Service-name resolution was non-deterministic.** Every `<candidates> | intersect(<present services>) | first` lookup (time-sync, `sssd`, `systemd-journald`) used `intersect()`, whose result order is not guaranteed to follow either input list -- it could return a different match on every run against the identical host state, occasionally picking a present-but-inactive unit (e.g. `ntp.service`, stopped) over the actually-running one. Replaced with `<candidates> | select('in', <present services>) | list | first`, which deterministically preserves the candidate list's priority order.
 - **`linux_vitals_time_sync_candidates` never included Debian/Ubuntu's actual service names.** It only listed `chronyd*` (RHEL's name) and `ntp*`, missing `chrony.service`/`chrony` (the real unit installed by Debian/Ubuntu's `chrony` package) and `systemd-timesyncd.service`/`systemd-timesyncd` (Ubuntu's out-of-the-box default). Every stock Ubuntu host was reporting a false "chronyd or ntp is not installed" finding despite `systemd-timesyncd` running the whole time. Both are now in the candidate list.
 - **Systemd alias units report `state: active`, not `state: running`.** `chronyd.service` is often a symlink alias to `chrony.service` on Debian/Ubuntu; `ansible.builtin.service_facts` reports alias units with `state: active` rather than `running`. The `sssd`/`systemd-journald`/time-sync "is it up" checks, and the self-healing restart-success check, only accepted `running` and treated a perfectly healthy aliased service as down. Both now accept `state in ['running', 'active']`.
-- **Same-task variable self-reference in bootloader validation.** `linux_vitals_bootloader_validation_message` referenced `linux_vitals_bootloader_default_matches_latest` from within the *same* `set_fact` call that defined it -- Ansible templates every key in a `set_fact` dict against the variable context that existed *before* the task ran, so this was always undefined at evaluation time. It only surfaced as a hard failure once bootloader detection actually reached `status: resolved` (i.e. on a real host with working `grubby`/`grub2-editenv`, never on the macOS dev machine). Split into two sequential tasks.
+- **Same-task variable self-reference in bootloader validation.** `linux_vitals_bootloader_validation_message` referenced `linux_vitals_bootloader_default_matches_latest` from within the _same_ `set_fact` call that defined it -- Ansible templates every key in a `set_fact` dict against the variable context that existed _before_ the task ran, so this was always undefined at evaluation time. It only surfaced as a hard failure once bootloader detection actually reached `status: resolved` (i.e. on a real host with working `grubby`/`grub2-editenv`, never on the macOS dev machine). Split into two sequential tasks.
 
 ## [1.0.0] - 2026-07-12
 
