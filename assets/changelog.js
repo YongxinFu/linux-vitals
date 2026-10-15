@@ -5,12 +5,18 @@ window.LV_CHANGELOG = [
   "date": null,
   "summary": "",
   "sections": {
-   "Fixed": 1,
-   "Added": 1,
+   "Changed": 1,
+   "Fixed": 7,
+   "Added": 3,
    "Documentation": 3
   },
   "highlights": [
-   "A finding can say that a check could not run"
+   "`log_errors` now counts journal entries at priority `err` or worse, instead of lines containing `error` or `failed`",
+   "Self-healing no longer reports a service `Fixed` before the restart has held",
+   "Journal scans are bounded and filtered on the managed host",
+   "A delivered email no longer fails the run",
+   "Retention pruning no longer deletes another report's archives",
+   "Each run archives the report it rendered"
   ]
  },
  {
@@ -46,7 +52,8 @@ window.LV_CHANGELOG = [
    "An operator runbook",
    "`vitals_certs`: TLS certificate expiry and hardening checks",
    "Severity-based finding classification and alert thresholds",
-   "JSON report schema is now `2.0`"
+   "JSON report schema is now `2.0`",
+   "`examples/group_vars/all.yml.example` recommended a path that does not work"
   ]
  },
  {
@@ -71,6 +78,7 @@ window.LV_CHANGELOG = [
    "Documentation": 2
   },
   "highlights": [
+   "The scan could fail at `Build per-host report object` with `type AnsibleUnsafeText doesn't define __round__ method`",
    "Role argument specs",
    "Collection dependencies are upper-bounded"
   ]
@@ -97,12 +105,12 @@ window.LV_CHANGELOG = [
    "Fixed": 4
   },
   "highlights": [
+   "Molecule scenarios for Ubuntu 24.04, Rocky Linux 9, Fedora 42, and openSUSE Leap 15",
    "Self-healing is exercised for real",
+   "Per-distro reboot detection is asserted against the source that distribution should use",
    "docs/testing.md",
    "Self-healing never restarted anything",
-   "Healing outcomes never reached the report",
-   "The scan crashed on any host without a separate `/boot` mount",
-   "`selinux_status` was reported as an empty string on Debian hosts"
+   "Healing outcomes never reached the report"
   ]
  },
  {

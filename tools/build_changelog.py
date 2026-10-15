@@ -16,7 +16,7 @@ from pathlib import Path
 
 HEADING = re.compile(r"^## \[(?P<version>[^\]]+)\](?: - (?P<date>\d{4}-\d{2}-\d{2}))?", re.M)
 SECTION = re.compile(r"^### (.+)$", re.M)
-BOLD_BULLET = re.compile(r"^- \*\*(.+?)\*\*", re.M)
+BOLD_BULLET = re.compile(r"^- \*\*(.+?)\*\*", re.M | re.S)
 LINK = re.compile(r"\[([^\]]+)\]\([^)]+\)")
 
 

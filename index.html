@@ -366,6 +366,13 @@
       <div class="term-bar"><span class="dots" aria-hidden="true"><i></i><i></i><i></i></span><span id="wf-title">control node</span><button type="button" id="wf-replay">↻ replay</button></div>
       <pre id="wf-term" aria-live="off"></pre>
     </div>
+
+    <p class="sub reveal" style="margin-top: 22px;">
+      Too many hosts for one run? Shard the fleet: every shard keeps the window's maintenance id, and from the next release
+      each one sets its own <code>linux_vitals_snapshot_shard</code>, so a shard id reused for a different set of hosts is refused
+      instead of silently merged into the comparison.
+      <a href="https://github.com/sameeralam3127/linux-vitals/blob/main/docs/performance.md#sharding-a-large-fleet" style="color: var(--accent);">Sharding a large fleet ↗</a>
+    </p>
   </div>
 </section>
 

@@ -3,7 +3,7 @@
 // collection's golden scan fixtures, plus each baseline host's findings.
 window.LV_FLEET = {
  "schema_version": "2.1",
- "generated_at": "20261013T180105Z",
+ "generated_at": "20261015T185034Z",
  "report": {
   "title": "LinuxVitals Health Check Dashboard"
  },
@@ -60,7 +60,7 @@ window.LV_FLEET = {
     "type": "Virtual Machine",
     "virtualization_type": "VMware",
     "uptime": "2d 3h 7m",
-    "last_reboot": "system boot  2026-09-24 10:55"
+    "last_reboot": "2026-09-24 10:55"
    },
    "kernel": {
     "running": "6.8.0-45-generic",
@@ -198,7 +198,7 @@ window.LV_FLEET = {
     "type": "Virtual Machine",
     "virtualization_type": "VMware",
     "uptime": "2d 3h 7m",
-    "last_reboot": "system boot  2026-09-24 10:55"
+    "last_reboot": "2026-09-24 10:55"
    },
    "kernel": {
     "running": "6.8.0-45-generic",
@@ -298,7 +298,7 @@ window.LV_FLEET = {
     "type": "Virtual Machine",
     "virtualization_type": "VMware",
     "uptime": "2d 3h 7m",
-    "last_reboot": "system boot  2026-09-24 10:55"
+    "last_reboot": "2026-09-24 10:55"
    },
    "kernel": {
     "running": "6.8.0-45-generic",
@@ -428,7 +428,7 @@ window.LV_FLEET = {
     "type": "Virtual Machine",
     "virtualization_type": "kvm",
     "uptime": "6d 0h 1m",
-    "last_reboot": "system boot  2026-09-20 06:12"
+    "last_reboot": "2026-09-20 06:12"
    },
    "kernel": {
     "running": "5.14.0-427.13.1.el9_4.x86_64",
@@ -550,7 +550,7 @@ window.LV_FLEET = {
     "type": "Virtual Machine",
     "virtualization_type": "kvm",
     "uptime": "7d 0h 0m",
-    "last_reboot": "system boot  2026-09-19 14:02"
+    "last_reboot": "2026-09-19 14:02"
    },
    "kernel": {
     "running": "5.14.0-427.13.1.el9_4.x86_64",
@@ -739,7 +739,7 @@ window.LV_FLEET = {
     "type": "Cloud Instance",
     "virtualization_type": "kvm",
     "uptime": "6d 0h 1m",
-    "last_reboot": "system boot  2026-09-20 06:12"
+    "last_reboot": "2026-09-20 06:12"
    },
    "kernel": {
     "running": "6.1.112-122.189.amzn2023.x86_64",
@@ -842,7 +842,7 @@ window.LV_FLEET = {
     "type": "Physical",
     "virtualization_type": "NA",
     "uptime": "0d 12h 1m",
-    "last_reboot": "system boot  2026-09-26 02:01"
+    "last_reboot": "2026-09-26 02:01"
    },
    "kernel": {
     "running": "6.10.10-200.fc40.x86_64",
@@ -944,7 +944,7 @@ window.LV_FLEET = {
     "type": "Physical",
     "virtualization_type": "NA",
     "uptime": "14d 0h 0m",
-    "last_reboot": "system boot  2026-09-12 08:30"
+    "last_reboot": "2026-09-12 08:30"
    },
    "kernel": {
     "running": "6.10.10-200.fc40.x86_64",
@@ -1068,7 +1068,7 @@ window.LV_FLEET = {
     "type": "Virtual Machine",
     "virtualization_type": "kvm",
     "uptime": "11d 0h 0m",
-    "last_reboot": "system boot  2026-09-15 10:02"
+    "last_reboot": "2026-09-15 10:02"
    },
    "kernel": {
     "running": "6.4.0-150600.23.22-default",
@@ -1168,7 +1168,7 @@ window.LV_FLEET = {
     "type": "Virtual Machine",
     "virtualization_type": "kvm",
     "uptime": "3d 0h 0m",
-    "last_reboot": "system boot  2026-09-23 14:02"
+    "last_reboot": "2026-09-23 14:02"
    },
    "kernel": {
     "running": "6.4.0-150600.23.22-default",
@@ -1353,7 +1353,7 @@ window.LV_FLEET = {
     "type": "Virtual Machine",
     "virtualization_type": "VMware",
     "uptime": "2d 3h 7m",
-    "last_reboot": "system boot  2026-09-24 10:55"
+    "last_reboot": "2026-09-24 10:55"
    },
    "kernel": {
     "running": "6.1.0-26-amd64",
