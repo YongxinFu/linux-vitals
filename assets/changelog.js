@@ -5,7 +5,7 @@ window.LV_CHANGELOG = [
   "date": null,
   "summary": "",
   "sections": {
-   "Changed": 1,
+   "Changed": 2,
    "Fixed": 7,
    "Added": 3,
    "Documentation": 3
