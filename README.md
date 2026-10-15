@@ -315,44 +315,49 @@ ansible-playbook -i inventory.ini playbooks/healthcheck.yml --tags kernel,report
 ## Architecture
 
 Four composable roles sharing one `linux_vitals_*` namespace — run them
-together via `playbooks/healthcheck.yml`, or individually in your own playbook:
+together via `playbooks/healthcheck.yml`, or individually in your own playbook.
+Solid red roles always run; dashed ones are opt-in and off by default.
 
 ```mermaid
 flowchart TB
-    CN(["Ansible control node<br/>playbooks/healthcheck.yml"])
-
-    CN -. "SSH · agentless · nothing installed on targets" .-> FLEET
-
-    subgraph FLEET["Managed fleet"]
+    subgraph FLEET["Managed hosts · SSH only, nothing installed"]
         direction LR
-        U["Ubuntu / Debian<br/>apt · reboot-required file"]
-        R["RHEL / Rocky / Alma<br/>dnf · needs-restarting"]
-        F["Fedora<br/>dnf5 · needs-restarting"]
-        S["openSUSE / SLES<br/>zypper · needs-rebooting"]
-        U ~~~ R ~~~ F ~~~ S
+        DEB["<b>Debian family</b><br/>Ubuntu · Debian"]
+        RH["<b>Red Hat family</b><br/>RHEL · Rocky<br/>Alma · Fedora<br/>Amazon Linux"]
+        SUSE["<b>SUSE family</b><br/>openSUSE · SLES"]
+        DEB ~~~ RH ~~~ SUSE
     end
 
-    FLEET ==> SCAN
+    subgraph ROLES["Ansible control node · roles run in order"]
+        direction LR
+        SCAN["<b>vitals_scan</b><br/>read-only<br/>checks"]
+        HEAL["<b>vitals_heal</b><br/>restarts failed units"]
+        CERTS["<b>vitals_certs</b><br/>TLS certificates"]
+        REPORT["<b>vitals_report</b><br/>render · notify<br/>compare · gate"]
+        SCAN --> HEAL --> CERTS --> REPORT
+    end
 
-    SCAN["<b>vitals_scan</b> — read-only<br/>facts · services · memory · journal<br/>kernel · bootloader · boot space · security"]
-    HEAL["<b>vitals_heal</b> — opt-in, off by default<br/>one restart per enabled failed unit"]
-    CERTS["<b>vitals_certs</b> — opt-in, off by default<br/>TLS expiry · weak signatures · served vs on disk"]
-    REPORT["<b>vitals_report</b><br/>snapshot · compare · render · notify"]
+    subgraph OUT["What you get"]
+        direction LR
+        HTML["<b>Dashboard</b><br/>one HTML file"]
+        JSON["<b>JSON report</b><br/>schema 2.1"]
+        SNAP["<b>Snapshots</b><br/>before → after"]
+        MSG["<b>Notifications</b><br/>Slack · email<br/>webhook"]
+        HTML ~~~ JSON ~~~ SNAP ~~~ MSG
+    end
 
-    SCAN ==>|"linux_vitals_result per host"| HEAL
-    HEAL ==>|"rebuilt result"| CERTS
-    CERTS ==>|"findings merged"| REPORT
+    FLEET -->|"over SSH"| ROLES
+    ROLES --> OUT
 
-    REPORT --> HTML["HTML dashboard<br/>self-contained, no CDN"]
-    REPORT --> JSON["JSON report<br/>schema 2.1"]
-    REPORT --> NOTIFY["Slack · email · webhook<br/>summary only"]
-
-    classDef stage fill:#0b7285,stroke:#095c6b,color:#ffffff
-    classDef out fill:#f1f3f5,stroke:#adb5bd,color:#212529
-    classDef host fill:#e7f5ff,stroke:#4dabf7,color:#0b3d5c
-    class SCAN,HEAL,CERTS,REPORT stage
-    class HTML,JSON,NOTIFY out
-    class U,R,F,S host
+    classDef core fill:#ee0000,stroke:#a60000,color:#ffffff
+    classDef optin fill:#ffffff,stroke:#ee0000,stroke-width:2px,stroke-dasharray:6 4,color:#151515
+    classDef item fill:#f2f2f2,stroke:#8a8d90,color:#151515
+    class SCAN,REPORT core
+    class HEAL,CERTS optin
+    class DEB,RH,SUSE,HTML,JSON,SNAP,MSG item
+    style ROLES fill:none,stroke:#ee0000,stroke-width:1px,color:#8a8d90
+    style FLEET fill:none,stroke:#8a8d90,stroke-dasharray:4 4,color:#8a8d90
+    style OUT fill:none,stroke:#8a8d90,stroke-dasharray:4 4,color:#8a8d90
 ```
 
 Why the roles share one variable namespace, and why paths resolve from
