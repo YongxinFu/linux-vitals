@@ -36,7 +36,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
   ([#153](https://github.com/sameeralam3127/linux-vitals/issues/153)). Anyone
   running a `baseline` or `postcheck` with an ID containing `/`, `\`, a leading
   `.`, or a control character will now get an error before a snapshot is
-  written. Leading and trailing whitespace is trimmed, so padded IDs use the
+  written. Leading and trailing spaces are trimmed, so padded IDs use the
   trimmed snapshot directory; an open window whose baseline was written on
   2.1.0 with a padded ID will not find that baseline at the trimmed path.
   `report.json`'s `maintenance_id` is also trimmed. Finish any open maintenance

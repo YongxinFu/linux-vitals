@@ -1,4 +1,20 @@
 ---
+- name: Require a usable maintenance id
+  ansible.builtin.assert:
+    that:
+      - (linux_vitals_maintenance_id | default('', true) | string | trim) is not search('[/\\\\]')
+      - (linux_vitals_maintenance_id | default('', true) | string | trim) is not match('^[.]')
+      - (linux_vitals_maintenance_id | default('', true) | string) is not search('[\\x00-\\x1f\\x7f-\\x9f]')
+    fail_msg: >-
+      linux_vitals_maintenance_id must not contain path separators, start with
+      '.', or contain control characters; got
+      {{ linux_vitals_maintenance_id | to_json }}. Leading and trailing
+      spaces are ignored.
+    quiet: true
+  when: linux_vitals_phase in ['baseline', 'postcheck']
+  tags:
+    - reporting
+
 - name: Require a maintenance id for baseline/postcheck snapshots
   ansible.builtin.assert:
     that:
@@ -8,22 +24,6 @@
       '{{ linux_vitals_phase }}'. Pass one with, for example,
       -e linux_vitals_maintenance_id=2026-07-12-patch-window
       and reuse the same id for both the baseline and postcheck runs.
-    quiet: true
-  when: linux_vitals_phase in ['baseline', 'postcheck']
-  tags:
-    - reporting
-
-- name: Require a usable maintenance id
-  ansible.builtin.assert:
-    that:
-      - (linux_vitals_maintenance_id | default('', true) | string | trim) is not search('[/\\\\]')
-      - (linux_vitals_maintenance_id | default('', true) | string | trim) is not match('^[.]')
-      - (linux_vitals_maintenance_id | default('', true) | string | trim) is not search('[\\x00-\\x1f\\x7f]')
-    fail_msg: >-
-      linux_vitals_maintenance_id must not contain path separators, start with
-      '.', or contain control characters; got
-      {{ linux_vitals_maintenance_id | to_json }}. Leading and trailing
-      whitespace is ignored.
     quiet: true
   when: linux_vitals_phase in ['baseline', 'postcheck']
   tags:

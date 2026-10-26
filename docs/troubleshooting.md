@@ -30,8 +30,8 @@ postcheck. Reuse the exact same id for both runs.
 `linux_vitals_maintenance_id` contains an invalid value.**
 The id cannot contain `/`, `\`, control characters, or start with `.` because
 it names a directory below `linux_vitals_snapshot_dir`. Leading and trailing
-whitespace is ignored. Choose a valid id, then use the same id for the
-baseline and postcheck runs.
+spaces are ignored; control characters are refused even at the ends. Choose
+a valid id, then use the same id for the baseline and postcheck runs.
 
 **A `baseline` or `postcheck` run fails with "Snapshot shard '...' of
 maintenance id '...' (...) was recorded with N host(s), and this run also

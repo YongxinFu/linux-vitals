@@ -374,7 +374,19 @@ def test_shard_id_pattern(shard: str, accepted: bool) -> None:
 
 @pytest.mark.parametrize(
     "maintenance_id",
-    [".", "..", "../x", ".hidden", "a/b", "a\\b", "bad\x01id"],
+    [
+        ".",
+        "..",
+        "../x",
+        ".hidden",
+        "a/b",
+        "a\\b",
+        "bad\x01id",
+        "\twindow",
+        "window\n",
+        "bad\u0080id",
+        "bad\u009fid",
+    ],
 )
 def test_an_unusable_maintenance_id_stops_before_writing(
     tmp_path: Path, maintenance_id: str
