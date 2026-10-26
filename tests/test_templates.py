@@ -199,8 +199,6 @@ def test_baseline_postcheck_comparison_detects_improvement_and_regression(tmp_pa
         [
             _ansible_playbook_bin(),
             str(COMPARE_PLAYBOOK),
-            "-e",
-            json.dumps({"linux_vitals_maintenance_id": " test-window "}),
         ],
         check=True,
         cwd=REPO_ROOT,
@@ -264,6 +262,25 @@ def test_baseline_postcheck_comparison_detects_improvement_and_regression(tmp_pa
     host_f = comparisons["host-f"]
     assert [f["subject"] for f in host_f["new_findings"]] == ["postgresql.service"]
     assert [f["subject"] for f in host_f["resolved_findings"]] == ["redis.service"]
+
+
+def test_maintenance_id_is_trimmed_for_baseline_comparison(tmp_path: Path) -> None:
+    env = _base_env(tmp_path)
+
+    subprocess.run(
+        [
+            _ansible_playbook_bin(),
+            str(COMPARE_PLAYBOOK),
+            "-e",
+            json.dumps({"linux_vitals_maintenance_id": " test-window "}),
+        ],
+        check=True,
+        cwd=REPO_ROOT,
+        env=env,
+    )
+
+    comparisons = json.loads((tmp_path / "comparisons.json").read_text(encoding="utf-8"))
+    assert comparisons["host-a"]["baseline_available"] is True
 
 
 def _host_table(blocks: list) -> list[str]:
