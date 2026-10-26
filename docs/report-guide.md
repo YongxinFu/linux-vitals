@@ -148,7 +148,8 @@ whose final status is `Fail`, regardless of finding severity. The clearer
 
 Schema `2.1` is additive over `2.0`: every finding gains `status` (and
 `reason` when the status is `unknown`), each host gains `unknown_count`, the
-summary gains `unknown_host_count`, and each `healing_results` entry gains
+summary gains `unknown_host_count` and `failing_host_count` (an alias for the
+existing `critical_error_count`), and each `healing_results` entry gains
 `outcome`, `reason` and `detail`. Each host also gains `pressure`
 ([#34](https://github.com/sameeralam3127/linux-vitals/issues/34)). Nothing was removed or renamed, and no existing field changed
 type or meaning.

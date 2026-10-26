@@ -8,6 +8,14 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ### Changed
 
+- **Failing hosts are labeled accurately in report summaries**
+  ([#143](https://github.com/sameeralam3127/linux-vitals/issues/143)). The
+  `summary.snippet` and Slack, email and webhook `message` wording now say
+  "N Failing Host(s)" instead of "N Critical Error(s)"; they count hosts whose
+  final status is `Fail`, regardless of finding severity. Anyone matching
+  those labels in the text will need to update their match and should read
+  `critical_error_count` for the count instead.
+
 - **`log_errors` now counts journal entries at priority `err` or worse,
   instead of lines containing `error` or `failed`**
   ([#23](https://github.com/sameeralam3127/linux-vitals/issues/23)). The
@@ -133,6 +141,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
   with what concurrent runs can and cannot safely share.
 
 ### Added
+
+- **`summary.failing_host_count`** is an additive alias for
+  `critical_error_count`, which remains unchanged for compatibility. The
+  report stays at schema `2.1`.
 
 - **CPU saturation, pressure stall and swap activity checks** ([#34](https://github.com/sameeralam3127/linux-vitals/issues/34)).
   Memory used to be the only pressure signal, so a host pinned at load 40

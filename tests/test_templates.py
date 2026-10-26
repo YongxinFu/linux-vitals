@@ -7,6 +7,8 @@ import subprocess
 from pathlib import Path
 from shutil import which
 
+import yaml
+
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 PLAYBOOK = REPO_ROOT / "tests" / "fixtures" / "render_templates.yml"
@@ -171,6 +173,9 @@ def test_warning_only_failures_are_labeled_as_failing_hosts(tmp_path: Path) -> N
                 {
                     "fixture_failing_host_count": 1,
                     "fixture_final_status": "Fail",
+                    "fixture_auto_fixed_count": 0,
+                    "fixture_health_score_pct": 0.0,
+                    "fixture_health_score_band": "Poor",
                     "fixture_snippet": "1 Servers Checked, 0 Auto-Fixed, 1 Failing Host",
                 }
             ),
@@ -189,8 +194,7 @@ def test_warning_only_failures_are_labeled_as_failing_hosts(tmp_path: Path) -> N
     assert "Failing Hosts: 1" in slack
     assert "Critical Errors" not in slack
     assert "Critical Errors" not in html
-    assert "Critical errors" not in slack_blocks["text"]
-    assert slack_blocks["text"].endswith("1 failing host, 1 auto-fixed")
+    assert slack_blocks["text"] == "LinuxVitals: FAIL — 1 host(s) checked, 1 failing host, 0 auto-fixed"
     counters = {
         field["text"].split("\n")[0]: field["text"].split("\n")[1]
         for block in slack_blocks["attachments"][0]["blocks"]
@@ -206,6 +210,54 @@ def test_warning_only_failures_are_labeled_as_failing_hosts(tmp_path: Path) -> N
     assert report["summary"]["critical_error_count"] == 1
     assert report["summary"]["failing_host_count"] == 1
     assert report["summary"]["findings_by_severity"]["critical"] == 0
+
+
+def test_real_render_reports_warning_only_failure_with_failing_host_counts(tmp_path: Path) -> None:
+    fixture_vars = yaml.safe_load(ARCHIVE_PLAYBOOK.read_text(encoding="utf-8"))[0]["vars"]
+    result = dict(fixture_vars["fixture_linux_vitals_result"])
+    result.update(
+        {
+            "final_status": "Fail",
+            "severity": "warning",
+            "severity_counts": {"info": 0, "warning": 1, "critical": 0},
+            "findings": [
+                {
+                    "id": "warning_only_failure",
+                    "message": "Warning-only finding",
+                    "severity": "warning",
+                    "status": "fail",
+                }
+            ],
+        }
+    )
+    extra_vars = tmp_path / "warning_only_failure.json"
+    extra_vars.write_text(
+        json.dumps({"fixture_linux_vitals_result": result}),
+        encoding="utf-8",
+    )
+
+    subprocess.run(
+        [
+            _ansible_playbook_bin(),
+            str(ARCHIVE_PLAYBOOK),
+            "-e",
+            f"@{extra_vars}",
+        ],
+        check=True,
+        cwd=REPO_ROOT,
+        env=_base_env(tmp_path),
+    )
+
+    report = json.loads(
+        (tmp_path / "latest" / "linux_vitals_report.json").read_text(encoding="utf-8")
+    )
+    summary = report["summary"]
+    assert summary["snippet"] == "1 Servers Checked, 0 Auto-Fixed, 1 Failing Host"
+    assert summary["critical_error_count"] == summary["failing_host_count"] == 1
+    assert summary["findings_by_severity"]["critical"] == 0
+    assert summary["auto_fixed_count"] == 0
+    assert summary["health_score_pct"] == 0.0
+    assert summary["health_score_band"] == "Poor"
 
 
 def test_reporting_archives_timestamped_outputs_and_prunes_old_reports(tmp_path: Path) -> None:

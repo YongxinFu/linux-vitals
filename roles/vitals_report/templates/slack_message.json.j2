@@ -45,7 +45,7 @@
 {%- set severity_short = {'critical': 'CRIT', 'warning': 'WARN', 'info': 'info', 'none': 'ok'} -%}
 {%- set hbs = linux_vitals_summary.hosts_by_severity | default({}) -%}
 {%- set fbs = linux_vitals_summary.findings_by_severity | default({}) -%}
-{%- set failing_hosts = linux_vitals_summary.failing_host_count | default(linux_vitals_summary.critical_error_count) | int -%}
+{%- set failing_hosts = linux_vitals_summary.critical_error_count | int -%}
 {#- The PASS/FAIL word is derived exactly as slack_message.txt.j2 and
     generic_webhook_payload.json.j2 derive it. Severity only chooses the
     colour bar, so the three consumers can never disagree on the verdict. -#}
