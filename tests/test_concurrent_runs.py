@@ -400,7 +400,10 @@ def test_an_unusable_maintenance_id_stops_before_writing(
     assert result.returncode != 0
     assert "linux_vitals_maintenance_id" in result.stdout
     assert "path separators" in result.stdout
-    assert f"got {json.dumps(maintenance_id)}" in result.stdout
+    expected_id_message = f"got {json.dumps(maintenance_id)}"
+    # ansible-core 2.16 JSON-escapes quotes inside the assert result message.
+    escaped_id_message = json.dumps(expected_id_message)[1:-1]
+    assert expected_id_message in result.stdout or escaped_id_message in result.stdout
     assert not (tmp_path / "snapshots").exists()
 
 
@@ -443,7 +446,7 @@ def test_maintenance_id_is_trimmed_and_keeps_valid_values(
     assert (phase_dir / "host-a.json").is_file()
     manifest = json.loads((phase_dir / ".shards" / "default.json").read_text(encoding="utf-8"))
     assert manifest["maintenance_id"] == normalized_id
-    if maintenance_id != normalized_id:
+    if str(maintenance_id) != normalized_id:
         assert not (tmp_path / "snapshots" / str(maintenance_id) / "baseline").exists()
 
 
