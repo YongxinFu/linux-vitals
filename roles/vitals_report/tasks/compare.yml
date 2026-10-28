@@ -38,7 +38,13 @@
 
 - name: Record the baseline capture time when available
   ansible.builtin.set_fact:
-    linux_vitals_baseline_captured_at: "{{ linux_vitals_baseline_result.captured_at | default(none) }}"
+    linux_vitals_baseline_captured_at: >-
+      {{ linux_vitals_baseline_result.captured_at | default('', true) | string }}
+    linux_vitals_baseline_timestamp_valid: >-
+      {{
+        (linux_vitals_baseline_result.captured_at | default('', true) | string)
+        is match('^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}Z$')
+      }}
     linux_vitals_baseline_age_hours: "{{ none }}"
   when:
     - linux_vitals_phase == 'postcheck'
@@ -55,13 +61,13 @@
   when:
     - linux_vitals_phase == 'postcheck'
     - linux_vitals_baseline_snapshot_file.stat.exists | default(false)
-    - linux_vitals_baseline_captured_at is not none
+    - linux_vitals_baseline_timestamp_valid | bool
   tags:
     - reporting
 
 - name: Determine whether baseline age needs attention
   ansible.builtin.set_fact:
-    linux_vitals_baseline_age_unknown: "{{ linux_vitals_baseline_captured_at is none }}"
+    linux_vitals_baseline_age_unknown: "{{ not (linux_vitals_baseline_timestamp_valid | bool) }}"
     linux_vitals_baseline_age_warning: >-
       {{ (linux_vitals_baseline_max_age_hours | int > 0)
          and (linux_vitals_baseline_age_hours | default(0) | float > linux_vitals_baseline_max_age_hours | int) }}
@@ -232,9 +238,13 @@
            'ram_used_pct_before': linux_vitals_comparison.ram_used_pct_before | float,
            'ram_used_pct_after': linux_vitals_comparison.ram_used_pct_after | float,
            'ram_used_pct_delta': linux_vitals_comparison.ram_used_pct_delta | float,
+           'baseline_captured_at': (
+             linux_vitals_comparison.baseline_captured_at
+             if linux_vitals_baseline_timestamp_valid | bool else none
+           ),
            'baseline_age_hours': (
              linux_vitals_comparison.baseline_age_hours | float
-             if linux_vitals_comparison.baseline_age_hours is not none else none
+             if linux_vitals_baseline_timestamp_valid | bool else none
            )
          }) }}
   when:

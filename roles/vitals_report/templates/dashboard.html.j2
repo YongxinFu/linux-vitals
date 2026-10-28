@@ -794,7 +794,7 @@
                 {% if cmp.baseline_age_unknown | default(false) | bool %}
                 <span class="pill pill--warning"><span class="dot"></span>Baseline age unknown</span><br>
                 {% else %}
-                <span>Baseline age: {{ cmp.baseline_age_hours | round(1) }} hours (captured {{ cmp.baseline_captured_at | e }})</span><br>
+                <span>Baseline age: {{ cmp.baseline_age_hours | float | round(1) }} hours (captured {{ cmp.baseline_captured_at | e }})</span><br>
                 {% if cmp.baseline_age_warning | default(false) | bool %}<span class="pill pill--warning"><span class="dot"></span>Older than {{ linux_vitals_summary.baseline_max_age_hours | default(72) }} hours</span><br>{% endif %}
                 {% endif %}
                 <span>Status: {{ cmp.status_before | e }} &#8594; {{ cmp.status_after | e }}</span><br>
